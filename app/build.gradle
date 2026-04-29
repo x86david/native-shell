@@ -12,9 +12,6 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
     implementation 'net.java.dev.jna:jna:5.14.0'
     implementation 'net.java.dev.jna:jna-platform:5.14.0'
-
-    // Required to compile the Feature class
-    compileOnly 'org.graalvm.sdk:nativeimage:23.1.2'
 }
 
 java {
@@ -36,7 +33,7 @@ graalvmNative {
             buildArgs.add('--enable-all-security-services')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // REMOVED: -H:DynamicProxyConfigurationResources flag
+            // REMOVED the H:DynamicProxy line - GraalVM auto-detects META-INF
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
@@ -44,7 +41,6 @@ graalvmNative {
             buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
             buildArgs.add('-H:IncludeResources=.*data\\.dat$')
         }
-
 
         register("attacker") {
             mainClass = 'shell.Attacker'
@@ -58,8 +54,4 @@ graalvmNative {
             buildArgs.add('-Djna.nosys=true')
         }
     }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
