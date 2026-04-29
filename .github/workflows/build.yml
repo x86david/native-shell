@@ -10,64 +10,55 @@ jobs:
       - name: Setup GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21'
+          java-version: '21' # Using 21 LTS as per your build.gradle
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debug Path Structure
         shell: pwsh
         run: |
-          Write-Host "--- Current Working Directory (Root) ---"
+          Write-Host "--- Environment Info ---"
           Get-Location
-          
-          Write-Host "--- Verifying Config Files Presence ---"
-          $proxyPath = "app/src/main/resources/META-INF/native-image/proxy-config.json"
-          $reflectPath = "app/src/main/resources/META-INF/native-image/reflect-config.json"
-          
-          if (Test-Path $proxyPath) { 
-              Write-Host "[OK] Found proxy-config.json at: $((Get-Item $proxyPath).FullName)" 
+          Write-Host "--- Verifying Metadata Files ---"
+          # This verifies the new structured path for JDK 24 style reachability
+          $metaPath = "app/src/main/resources/META-INF/native-image/shell/victim/reachability-metadata.json"
+          if (Test-Path $metaPath) { 
+              Write-Host "[OK] Found reachability-metadata.json at: $((Get-Item $metaPath).FullName)" 
           } else { 
-              Write-Host "[FAIL] Could not find proxy-config.json at $proxyPath" -ForegroundColor Red
+              Write-Host "[!] Metadata file NOT found at $metaPath. Check directory structure." -ForegroundColor Yellow
           }
 
-          if (Test-Path $reflectPath) { 
-              Write-Host "[OK] Found reflect-config.json at: $((Get-Item $reflectPath).FullName)" 
-          } else { 
-              Write-Host "[FAIL] Could not find reflect-config.json at $reflectPath" -ForegroundColor Red
-          }
-
-      - name: Build Victim EXE with Debug Info
+      - name: Build Victim EXE
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          :: We pass the tracing flags through a project property to ensure the plugin picks them up
+          :: Passing verbose flags to see exactly what GraalVM picks up
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache --info ^
             -Pnative.buildArgs="--verbose -H:+TraceDynamicProxyConfig -H:+PrintAnalysisCallTree"
 
-      - name: Test Execution (Verify JNA & Print Missing Metadata)
+      - name: Test Execution & Metadata Diagnostic
         shell: pwsh
         run: |
           $buildDir = "app/build/native/nativeVictimCompile"
           $exePath = "$buildDir/victim.exe"
 
           if (!(Test-Path $exePath)) {
-              Write-Error "Binary not found at $exePath. Build might have failed silently."
-              return
+              Write-Error "Binary not found. Build likely failed."
+              exit 1
           }
 
-          Write-Host "[*] Preparing dependencies in $buildDir..."
-          Copy-Item "C:/Windows/System32/vcruntime140.dll" -Destination "$buildDir/"
-          Copy-Item "C:/Windows/System32/vcruntime140_1.dll" -Destination "$buildDir/"
+          Write-Host "[*] Copying runtime dependencies to $buildDir..."
+          Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "$buildDir/"
           Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "$buildDir/"
 
-          Write-Host "[*] Running victim.exe with Warning Mode..."
+          Write-Host "[*] Running victim.exe with Diagnostic Warnings..."
           try {
               Push-Location $buildDir
-              # This flag is the key: it will tell us EXACTLY what interface list is missing
+              # This flag prints EXACT missing metadata entries to the console
               .\victim.exe -XX:MissingRegistrationReportingMode=Warn
               Pop-Location
           } catch {
-              Write-Host "Execution encountered an error, but that's expected if metadata is missing."
+              Write-Host "Execution finished/crashed. Check logs above for 'Missing registration' warnings."
           }
         continue-on-error: true
 
@@ -75,11 +66,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "dist"
-          if (Test-Path "app/build/native/nativeVictimCompile/victim.exe") {
-              Copy-Item "app/build/native/nativeVictimCompile/victim.exe" -Destination "dist/"
-              Copy-Item "C:/Windows/System32/vcruntime*.dll" -Destination "dist/"
-              Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "dist/"
-          }
+          Copy-Item "app/build/native/nativeVictimCompile/victim.exe" -Destination "dist/"
+          Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "dist/"
+          Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "dist/"
           Get-ChildItem -Path "dist"
 
       - name: Upload Artifact

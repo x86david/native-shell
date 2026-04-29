@@ -51,17 +51,15 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // Debug Flags
-            buildArgs.add("-H:ThrowMissingRegistrationErrors=true") // Fails build if metadata is missing (Pre-JDK 23)
-            buildArgs.add("-H:+PrintAnalysisCallTree")             // Shows what the compiler "sees"
-            buildArgs.add("-H:+TraceDynamicProxyConfig")           // Specifically logs proxy registration attempts
+            // Enable JDK 24 User-Friendly Reachability Mode
+            buildArgs.add('--exact-reachability-metadata=shell')
 
-            // Absolute paths for the runner
-            buildArgs.add("-H:DynamicProxyConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
-            buildArgs.add("-H:ReflectionConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
+            // Explicitly point to the consolidated metadata file
+            buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
 
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
+            buildArgs.add('--verbose')
         }
 
     }
