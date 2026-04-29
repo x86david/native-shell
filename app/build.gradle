@@ -54,8 +54,12 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // Ensure these flags are still there:
+            // Enables strict metadata validation for your package
+            buildArgs.add('--exact-reachability-metadata=shell')
+
+            // Automatically picks up the consolidated reachability-metadata.json
             buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
+
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')

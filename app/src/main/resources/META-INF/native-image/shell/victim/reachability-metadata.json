@@ -3,7 +3,11 @@
     {
       "type": "shell.Victim$Kernel32",
       "allDeclaredMethods": true,
-      "allPublicMethods": true
+      "allPublicMethods": true,
+      "proxies": [
+        ["shell.Victim$Kernel32"],
+        ["shell.Victim$Kernel32", "com.sun.jna.win32.StdCallLibrary", "com.sun.jna.Library", "com.sun.jna.alt.ObjectContext"]
+      ]
     },
     {
       "type": "com.sun.jna.ptr.IntByReference",
@@ -11,8 +15,7 @@
       "fields": [{ "name": "value" }]
     }
   ],
-  "dynamic-proxies": [
-    [ "shell.Victim$Kernel32" ],
-    [ "shell.Victim$Kernel32", "com.sun.jna.win32.StdCallLibrary", "com.sun.jna.Library", "com.sun.jna.alt.ObjectContext" ]
+  "resources": [
+    { "pattern": "data\\.dat$" }
   ]
 }
