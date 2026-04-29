@@ -11,7 +11,7 @@
       "fields": [{ "name": "value" }]
     }
   ],
-  "dynamic-proxy": [
+  "dynamic-proxies": [
     [ "shell.Victim$Kernel32" ],
     [ "shell.Victim$Kernel32", "com.sun.jna.win32.StdCallLibrary", "com.sun.jna.Library", "com.sun.jna.alt.ObjectContext" ]
   ]
