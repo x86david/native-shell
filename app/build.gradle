@@ -50,11 +50,11 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
-            // Keep your existing args...
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
 
-            buildArgs.add("-H:ProxyConfigurationFiles=${project.projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
+            // Use the updated flag names here:
+            buildArgs.add("-H:DynamicProxyConfigurationFiles=${project.projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
             buildArgs.add("-H:ReflectionConfigurationFiles=${project.projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
         }
 
