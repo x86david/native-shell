@@ -8,18 +8,14 @@ repositories {
 }
 
 dependencies {
-    // For Attacker C2
     implementation 'org.bouncycastle:bcprov-jdk18on:1.80'
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
-
-    // For Victim Shellcode Loader
     implementation 'net.java.dev.jna:jna:5.14.0'
     implementation 'net.java.dev.jna:jna-platform:5.14.0'
 }
 
 java {
     toolchain {
-        // Keeps local compatibility with your Java 21
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
@@ -30,9 +26,7 @@ application {
 
 graalvmNative {
     binaries {
-        // 1. Use 'configureEach' instead of 'all' for better Gradle performance
         configureEach {
-            // 2. Setting the classpath correctly to avoid "cannot assign" errors
             classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
 
             buildArgs.add('--no-fallback')
@@ -61,16 +55,11 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // Static linking for C-runtime
+            // Forces C-runtime static linking
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
-
-            // Modern way to hide the console window in GraalVM
-            buildArgs.add('--gui')
-
-            // JNA needs this to avoid searching system paths
+            // Avoids JNA searching system paths
             buildArgs.add('-Djna.nosys=true')
         }
-
     }
 }
 

@@ -21,7 +21,8 @@ jobs:
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache
           :: Create a clean distribution folder
           mkdir dist
-          copy app\build\native\nativeVictimCompile\victim.exe dist\
+          :: Note: The plugin puts the exe in a folder named after the register name + 'Compile'
+          copy app\build\native\victimCompile\victim.exe dist\
           :: Grab the Microsoft C++ Redistributable DLLs from the runner
           copy C:\Windows\System32\vcruntime140.dll dist\
           copy C:\Windows\System32\vcruntime140_1.dll dist\
