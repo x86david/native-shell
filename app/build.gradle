@@ -27,7 +27,6 @@ application {
 graalvmNative {
     binaries {
         configureEach {
-            // Using a simple assignment to ensure all resources are included
             classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
 
             buildArgs.add('--no-fallback')
@@ -35,8 +34,8 @@ graalvmNative {
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // --- JNA PROXY FIX ---
-            buildArgs.add("-H:DynamicProxyConfigurationResources=proxy-config.json")
+            // --- FIXED JNA PROXY PATH ---
+            buildArgs.add("-H:DynamicProxyConfigurationResources=${projectDir}/META-INF/native-image/proxy-config.json")
 
             // BouncyCastle Config
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
