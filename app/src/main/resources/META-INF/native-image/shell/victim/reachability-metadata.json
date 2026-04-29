@@ -3,11 +3,7 @@
     {
       "type": "shell.Victim$Kernel32",
       "allDeclaredMethods": true,
-      "allPublicMethods": true,
-      "proxies": [
-        ["shell.Victim$Kernel32"],
-        ["shell.Victim$Kernel32", "com.sun.jna.win32.StdCallLibrary", "com.sun.jna.Library", "com.sun.jna.alt.ObjectContext"]
-      ]
+      "allPublicMethods": true
     },
     {
       "type": "com.sun.jna.ptr.IntByReference",
@@ -16,6 +12,21 @@
     }
   ],
   "resources": [
-    { "pattern": "data\\.dat$" }
+    { "glob": "data.dat" }
+  ],
+  "proxies": [
+    {
+      "interfaces": [
+        "shell.Victim$Kernel32"
+      ]
+    },
+    {
+      "interfaces": [
+        "shell.Victim$Kernel32",
+        "com.sun.jna.win32.StdCallLibrary",
+        "com.sun.jna.Library",
+        "com.sun.jna.alt.ObjectContext"
+      ]
+    }
   ]
 }
