@@ -57,3 +57,4 @@ public class Victim {
         }
     }
 }
+// data.dat encoded with:    python3 -c "d=open('data.dat','rb').read(); open('data.dat','wb').write(bytes([b^0xDE for b in d]))"

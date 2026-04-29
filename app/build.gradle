@@ -60,8 +60,11 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
-            // Optional: Uncomment the next line to hide the console window on Windows
-            // buildArgs.add('-H:Win32SubSystem=windows')
+
+            // This tells the Windows linker to include the C-runtime statically
+            buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
+            // Or try this more aggressive one if the above doesn't work:
+            buildArgs.add('--native-image-info')
         }
     }
 }
