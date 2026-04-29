@@ -34,20 +34,15 @@ graalvmNative {
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // --- FIXED JNA PROXY PATH ---
-            buildArgs.add("-H:DynamicProxyConfigurationResources=${projectDir}/META-INF/native-image/proxy-config.json")
+            // REMOVED the H:DynamicProxy line - GraalVM finds it in resources automatically now
 
-            // BouncyCastle Config
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
             buildArgs.add('-H:AdditionalSecurityProviders=org.bouncycastle.jce.provider.BouncyCastleProvider')
-            buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi')
-            buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA256')
-
-            // Resources
-            buildArgs.add('-H:IncludeResources=.*data\\.dat$')
             buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
+            buildArgs.add('-H:IncludeResources=.*data\\.dat$')
         }
+
 
         register("attacker") {
             mainClass = 'shell.Attacker'
