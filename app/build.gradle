@@ -40,6 +40,9 @@ graalvmNative {
             buildArgs.add('-H:AdditionalSecurityProviders=org.bouncycastle.jce.provider.BouncyCastleProvider')
             buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
             buildArgs.add('-H:IncludeResources=.*data\\.dat$')
+
+            buildArgs.add('--enable-native-access=ALL-UNNAMED')
+
         }
 
         register("attacker") {
