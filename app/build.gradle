@@ -50,16 +50,13 @@ graalvmNative {
             imageName = 'attacker'
         }
 
-        egister("victim") {
+        register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // We use the consolidated directory flag
+            // Ensure these flags are still there:
             buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
-
-            // Force native access for JNA
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
-
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
         }
