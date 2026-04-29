@@ -19,8 +19,8 @@ dependencies {
 
 java {
     toolchain {
-        // Keeps local compatibility with your Java 25
-        languageVersion = JavaLanguageVersion.of(25)
+        // Keeps local compatibility with your Java 21
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
