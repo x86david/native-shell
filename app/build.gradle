@@ -27,12 +27,16 @@ application {
 graalvmNative {
     binaries {
         configureEach {
+            // Using a simple assignment to ensure all resources are included
             classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
 
             buildArgs.add('--no-fallback')
             buildArgs.add('--enable-all-security-services')
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
+
+            // --- JNA PROXY FIX ---
+            buildArgs.add("-H:DynamicProxyConfigurationResources=proxy-config.json")
 
             // BouncyCastle Config
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
@@ -41,7 +45,7 @@ graalvmNative {
             buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi')
             buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA256')
 
-            // Resource & JNA Config
+            // Resources
             buildArgs.add('-H:IncludeResources=.*data\\.dat$')
             buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
         }
@@ -54,10 +58,7 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
-
-            // Forces C-runtime static linking
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
-            // Avoids JNA searching system paths
             buildArgs.add('-Djna.nosys=true')
         }
     }
