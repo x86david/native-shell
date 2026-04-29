@@ -19,9 +19,16 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache
+          :: Create a clean distribution folder
+          mkdir dist
+          copy app\build\native\nativeVictimCompile\victim.exe dist\
+          :: Grab the Microsoft C++ Redistributable DLLs from the runner
+          copy C:\Windows\System32\vcruntime140.dll dist\
+          copy C:\Windows\System32\vcruntime140_1.dll dist\
+          copy C:\Windows\System32\msvcp140.dll dist\
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: victim-binary
-          path: app/build/native/nativeVictimCompile/victim.exe
+          name: victim-standalone-package
+          path: dist/
