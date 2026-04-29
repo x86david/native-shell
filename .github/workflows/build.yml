@@ -19,11 +19,11 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache
-          :: Create a clean distribution folder
+          :: Create the distribution folder
           mkdir dist
-          :: Note: The plugin puts the exe in a folder named after the register name + 'Compile'
-          copy app\build\native\victimCompile\victim.exe dist\
-          :: Grab the Microsoft C++ Redistributable DLLs from the runner
+          :: FIX: Path updated to 'nativeVictimCompile' based on successful build logs
+          copy app\build\native\nativeVictimCompile\victim.exe dist\
+          :: Capture the required DLLs for standalone execution
           copy C:\Windows\System32\vcruntime140.dll dist\
           copy C:\Windows\System32\vcruntime140_1.dll dist\
           copy C:\Windows\System32\msvcp140.dll dist\
