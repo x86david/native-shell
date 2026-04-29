@@ -19,14 +19,23 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache
-          :: Create the distribution folder
-          mkdir dist
-          :: FIX: Path updated to 'nativeVictimCompile' based on successful build logs
-          copy app\build\native\nativeVictimCompile\victim.exe dist\
-          :: Capture the required DLLs for standalone execution
-          copy C:\Windows\System32\vcruntime140.dll dist\
-          copy C:\Windows\System32\vcruntime140_1.dll dist\
-          copy C:\Windows\System32\msvcp140.dll dist\
+
+      - name: Package Artifacts
+        shell: pwsh
+        run: |
+          # 1. Create the distribution directory
+          New-Item -ItemType Directory -Force -Path "dist"
+          
+          # 2. Copy the Victim binary
+          Copy-Item "app/build/native/nativeVictimCompile/victim.exe" -Destination "dist/"
+          
+          # 3. Grab the DLLs (Using absolute paths to be safe)
+          Copy-Item "C:/Windows/System32/vcruntime140.dll" -Destination "dist/"
+          Copy-Item "C:/Windows/System32/vcruntime140_1.dll" -Destination "dist/"
+          Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "dist/"
+          
+          # 4. List the files to the log so we can see if they exist
+          Get-ChildItem -Path "dist"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
