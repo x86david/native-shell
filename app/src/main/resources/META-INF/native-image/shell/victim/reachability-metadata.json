@@ -14,11 +14,9 @@
   "resources": [
     { "glob": "data.dat" }
   ],
-  "proxies": [
+  "dynamic-proxies": [
     {
-      "interfaces": [
-        "shell.Victim$Kernel32"
-      ]
+      "interfaces": [ "shell.Victim$Kernel32" ]
     },
     {
       "interfaces": [
