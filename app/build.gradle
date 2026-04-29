@@ -12,6 +12,9 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
     implementation 'net.java.dev.jna:jna:5.14.0'
     implementation 'net.java.dev.jna:jna-platform:5.14.0'
+
+    // Required to compile the Feature class
+    compileOnly 'org.graalvm.sdk:nativeimage:23.1.2'
 }
 
 java {
@@ -34,7 +37,8 @@ graalvmNative {
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // REMOVED: Manual path flags (GraalVM auto-detects META-INF now)
+            // --- THE NUCLEAR FIX FLAG ---
+            buildArgs.add("--features=shell.Victim\$ProxyRegistrationFeature")
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
