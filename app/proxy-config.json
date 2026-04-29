@@ -1,0 +1,1 @@
+[{ "interfaces": [ "shell.Victim$Kernel32", "com.sun.jna.Library" ] }]

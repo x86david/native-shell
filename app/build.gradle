@@ -34,11 +34,11 @@ graalvmNative {
 
             buildArgs.add('--no-fallback')
             buildArgs.add('--enable-all-security-services')
-            buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // --- THE NUCLEAR FIX FLAG ---
-            buildArgs.add("--features=shell.Victim\$ProxyRegistrationFeature")
+            // --- THE COMPATIBLE PROXY FIX ---
+            // This is a direct command-line registration for GraalVM 21
+            buildArgs.add("-H:DynamicProxyConfigurationResources=proxy-config.json")
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
