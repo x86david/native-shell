@@ -34,10 +34,7 @@ graalvmNative {
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // --- THE BRUTE FORCE FIX ---
-            // Remove the backslash before the $
-            buildArgs.add("-H:DynamicProxyConfigurationResources=${projectDir}/src/main/resources/proxy-config.json")
-            buildArgs.add("-H:ReflectionConfigurationResources=${projectDir}/src/main/resources/reflect-config.json")
+            // REMOVED: Manual path flags (GraalVM auto-detects META-INF now)
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
