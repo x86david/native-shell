@@ -36,9 +36,7 @@ graalvmNative {
             buildArgs.add('--enable-all-security-services')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // --- THE COMPATIBLE PROXY FIX ---
-            // This is a direct command-line registration for GraalVM 21
-            buildArgs.add("-H:DynamicProxyConfigurationResources=proxy-config.json")
+            // REMOVED: -H:DynamicProxyConfigurationResources flag
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')

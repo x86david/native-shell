@@ -1,5 +1,1 @@
-[
-  {
-    "interfaces": [ "shell.Victim$Kernel32", "com.sun.jna.Library" ]
-  }
-]
+[{ "interfaces": [ "shell.Victim$Kernel32", "com.sun.jna.Library" ] }]
