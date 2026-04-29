@@ -10,56 +10,35 @@ jobs:
       - name: Setup GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21' # Using 21 LTS as per your build.gradle
+          java-version: '24'  # Upgrade to JDK 24
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debug Path Structure
         shell: pwsh
         run: |
-          Write-Host "--- Environment Info ---"
-          Get-Location
-          Write-Host "--- Verifying Metadata Files ---"
-          # This verifies the new structured path for JDK 24 style reachability
           $metaPath = "app/src/main/resources/META-INF/native-image/shell/victim/reachability-metadata.json"
           if (Test-Path $metaPath) { 
-              Write-Host "[OK] Found reachability-metadata.json at: $((Get-Item $metaPath).FullName)" 
-          } else { 
-              Write-Host "[!] Metadata file NOT found at $metaPath. Check directory structure." -ForegroundColor Yellow
+              Write-Host "[OK] Found consolidated metadata at: $((Get-Item $metaPath).FullName)" 
           }
 
       - name: Build Victim EXE
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          :: Passing verbose flags to see exactly what GraalVM picks up
-          gradlew.bat :app:nativeVictimCompile --no-configuration-cache --info ^
-            -Pnative.buildArgs="--verbose -H:+TraceDynamicProxyConfig -H:+PrintAnalysisCallTree"
+          :: Note: --exact-reachability-metadata will now be recognized
+          gradlew.bat :app:nativeVictimCompile --no-configuration-cache
 
       - name: Test Execution & Metadata Diagnostic
         shell: pwsh
         run: |
           $buildDir = "app/build/native/nativeVictimCompile"
-          $exePath = "$buildDir/victim.exe"
-
-          if (!(Test-Path $exePath)) {
-              Write-Error "Binary not found. Build likely failed."
-              exit 1
-          }
-
-          Write-Host "[*] Copying runtime dependencies to $buildDir..."
           Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "$buildDir/"
           Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "$buildDir/"
-
-          Write-Host "[*] Running victim.exe with Diagnostic Warnings..."
-          try {
-              Push-Location $buildDir
-              # This flag prints EXACT missing metadata entries to the console
-              .\victim.exe -XX:MissingRegistrationReportingMode=Warn
-              Pop-Location
-          } catch {
-              Write-Host "Execution finished/crashed. Check logs above for 'Missing registration' warnings."
-          }
+          Push-Location $buildDir
+          # Run to catch any remaining missing metadata
+          .\victim.exe -XX:MissingRegistrationReportingMode=Warn
+          Pop-Location
         continue-on-error: true
 
       - name: Package Artifacts
