@@ -19,6 +19,7 @@ dependencies {
 
 java {
     toolchain {
+        // Keeps local compatibility with your Java 25
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
@@ -29,11 +30,14 @@ application {
 
 graalvmNative {
     binaries {
-        all {
-            classpath(tasks.named('jar').get().archiveFile, configurations.runtimeClasspath)
+        // 1. Use 'configureEach' instead of 'all' for better Gradle performance
+        configureEach {
+            // 2. Setting the classpath correctly to avoid "cannot assign" errors
+            classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
 
             buildArgs.add('--no-fallback')
             buildArgs.add('--enable-all-security-services')
+            buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
             // BouncyCastle Config
@@ -43,10 +47,9 @@ graalvmNative {
             buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi')
             buildArgs.add('--initialize-at-build-time=org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA256')
 
-            // Resource & JNA Config (Fixed quotes)
+            // Resource & JNA Config
             buildArgs.add('-H:IncludeResources=.*data\\.dat$')
             buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
-            buildArgs.add('--collect-metadata-at-runtime')
         }
 
         register("attacker") {
@@ -57,10 +60,11 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
+            // Optional: Uncomment the next line to hide the console window on Windows
+            // buildArgs.add('-H:Win32SubSystem=windows')
         }
     }
 }
-
 
 tasks.named('test') {
     useJUnitPlatform()

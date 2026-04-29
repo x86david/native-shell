@@ -10,20 +10,9 @@ jobs:
       - name: Setup GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21' # Adjust to 25 if your action version supports it, else 21 is stable
+          java-version: '21'
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Build Victim EXE
         shell: cmd
@@ -35,4 +24,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: victim-binary
-          path: app/build/native/victimCompile/victim.exe
+          path: app/build/native/nativeVictimCompile/victim.exe
