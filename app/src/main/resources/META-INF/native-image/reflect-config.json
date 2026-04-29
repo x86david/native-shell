@@ -1,0 +1,16 @@
+[
+  {
+    "name": "shell.Victim$Kernel32",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.sun.jna.ptr.IntByReference",
+    "allPublicConstructors": true,
+    "fields": [{ "name": "value" }]
+  },
+  {
+    "name": "com.sun.jna.Pointer",
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  }
+]
