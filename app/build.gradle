@@ -54,8 +54,8 @@ graalvmNative {
             buildArgs.add('-Djna.nosys=true')
 
             // Use the exact flags GraalVM 21+ wants:
-            buildArgs.add("-H:DynamicProxyConfigurationFiles=${project.projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
-            buildArgs.add("-H:ReflectionConfigurationFiles=${project.projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
+            buildArgs.add("-H:DynamicProxyConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
+            buildArgs.add("-H:ReflectionConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
         }
 
     }
