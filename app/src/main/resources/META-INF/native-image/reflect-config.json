@@ -1,7 +1,8 @@
 [
   {
     "name": "shell.Victim$Kernel32",
-    "allDeclaredMethods": true
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
   },
   {
     "name": "com.sun.jna.ptr.IntByReference",
@@ -10,7 +11,13 @@
   },
   {
     "name": "com.sun.jna.Pointer",
-    "allPublicConstructors": true,
-    "allPublicMethods": true
+    "queryAllPublicConstructors": true,
+    "methods": [{ "name": "<init>", "parameterTypes": ["long"] }],
+    "fields": [{ "name": "peer" }]
+  },
+  {
+    "name": "com.sun.jna.Native",
+    "allPublicMethods": true,
+    "allDeclaredMethods": true
   }
 ]
