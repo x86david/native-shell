@@ -14,27 +14,54 @@ jobs:
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Victim EXE
+      - name: Debug Path Structure
+        shell: pwsh
+        run: |
+          Write-Host "--- Current Working Directory ---"
+          Get-Location
+          Write-Host "--- Project Root Contents ---"
+          ls -R
+          Write-Host "--- Checking for Config Files ---"
+          $proxyPath = "app/src/main/resources/META-INF/native-image/proxy-config.json"
+          if (Test-Path $proxyPath) { 
+              Write-Host "[OK] Found proxy-config.json at: $((Get-Item $proxyPath).FullName)" 
+          } else { 
+              Write-Error "[FAIL] Could not find proxy-config.json at $proxyPath" 
+          }
+
+      - name: Build Victim EXE with Debug Info
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          gradlew.bat :app:nativeVictimCompile --no-configuration-cache
+          ./gradlew.bat :app:nativeVictimCompile --no-configuration-cache --info ^
+            -Pnative.buildArgs="--verbose -H:+TraceDynamicProxyConfig -H:+PrintAnalysisCallTree"
+
+      - name: Test Execution (Verify JNA & Print Missing Metadata)
+        shell: pwsh
+        run: |
+          $buildDir = "app/build/native/nativeVictimCompile"
+          $exePath = "$buildDir/victim.exe"
+          Copy-Item "C:/Windows/System32/vcruntime140.dll" -Destination "$buildDir/"
+          Copy-Item "C:/Windows/System32/vcruntime140_1.dll" -Destination "$buildDir/"
+          Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "$buildDir/"
+
+          Write-Host "[*] Running victim.exe with metadata reporting..."
+          try {
+              Push-Location $buildDir
+              .\victim.exe -XX:MissingRegistrationReportingMode=Warn
+              Pop-Location
+          } catch {
+              Write-Error "Execution failed: $_"
+          }
+        continue-on-error: true
 
       - name: Package Artifacts
         shell: pwsh
         run: |
-          # 1. Create the distribution directory
           New-Item -ItemType Directory -Force -Path "dist"
-          
-          # 2. Copy the Victim binary
           Copy-Item "app/build/native/nativeVictimCompile/victim.exe" -Destination "dist/"
-          
-          # 3. Grab the DLLs (Using absolute paths to be safe)
-          Copy-Item "C:/Windows/System32/vcruntime140.dll" -Destination "dist/"
-          Copy-Item "C:/Windows/System32/vcruntime140_1.dll" -Destination "dist/"
+          Copy-Item "C:/Windows/System32/vcruntime*.dll" -Destination "dist/"
           Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "dist/"
-          
-          # 4. List the files to the log so we can see if they exist
           Get-ChildItem -Path "dist"
 
       - name: Upload Artifact

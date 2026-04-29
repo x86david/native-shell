@@ -50,13 +50,18 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
-            buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
-            buildArgs.add('-Djna.nosys=true')
 
-            // Use the exact flags GraalVM 21+ wants:
+            // Debug Flags
+            buildArgs.add("-H:ThrowMissingRegistrationErrors=true") // Fails build if metadata is missing (Pre-JDK 23)
+            buildArgs.add("-H:+PrintAnalysisCallTree")             // Shows what the compiler "sees"
+            buildArgs.add("-H:+TraceDynamicProxyConfig")           // Specifically logs proxy registration attempts
+
+            // Absolute paths for the runner
             buildArgs.add("-H:DynamicProxyConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/proxy-config.json")
             buildArgs.add("-H:ReflectionConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
 
+            buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
+            buildArgs.add('-Djna.nosys=true')
         }
 
     }
