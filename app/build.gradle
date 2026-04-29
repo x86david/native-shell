@@ -64,12 +64,13 @@ graalvmNative {
             // Static linking for C-runtime
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
 
-            // Hides the black CMD window when the victim runs
-            buildArgs.add('-H:Win32SubSystem=windows')
+            // Modern way to hide the console window in GraalVM
+            buildArgs.add('--gui')
 
-            // Renames internal binary strings to look less suspicious
-            buildArgs.add('-H:Name=WinUpdateSvc')
+            // JNA needs this to avoid searching system paths
+            buildArgs.add('-Djna.nosys=true')
         }
+
     }
 }
 
