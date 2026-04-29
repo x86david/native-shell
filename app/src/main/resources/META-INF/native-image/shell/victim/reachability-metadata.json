@@ -9,24 +9,10 @@
       "type": "com.sun.jna.ptr.IntByReference",
       "allPublicConstructors": true,
       "fields": [{ "name": "value" }]
-    },
-    {
-      "type": "com.sun.jna.Pointer",
-      "allPublicMethods": true,
-      "fields": [{ "name": "peer" }]
     }
   ],
-  "proxies": [
-    {
-      "interfaces": [ "shell.Victim$Kernel32" ]
-    },
-    {
-      "interfaces": [
-        "shell.Victim$Kernel32",
-        "com.sun.jna.win32.StdCallLibrary",
-        "com.sun.jna.Library",
-        "com.sun.jna.alt.ObjectContext"
-      ]
-    }
+  "dynamic-proxy": [
+    [ "shell.Victim$Kernel32" ],
+    [ "shell.Victim$Kernel32", "com.sun.jna.win32.StdCallLibrary", "com.sun.jna.Library", "com.sun.jna.alt.ObjectContext" ]
   ]
 }
