@@ -34,7 +34,10 @@ graalvmNative {
             buildArgs.add('--enable-https')
             buildArgs.add('-H:+AddAllCharsets')
 
-            // REMOVED the H:DynamicProxy line - GraalVM finds it in resources automatically now
+            // --- THE BRUTE FORCE FIX ---
+            // Remove the backslash before the $
+            buildArgs.add("-H:DynamicProxyConfigurationResources=${projectDir}/src/main/resources/proxy-config.json")
+            buildArgs.add("-H:ReflectionConfigurationResources=${projectDir}/src/main/resources/reflect-config.json")
 
             buildArgs.add('--initialize-at-build-time=org.bouncycastle')
             buildArgs.add('-H:+UnlockExperimentalVMOptions')

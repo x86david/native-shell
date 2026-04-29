@@ -1,0 +1,8 @@
+[
+  {
+    "name": "shell.Victim$Kernel32",
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  }
+]
