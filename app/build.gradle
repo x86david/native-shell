@@ -37,7 +37,8 @@ graalvmNative {
             imageName = 'victim'
 
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
-            buildArgs.add('--gui')
+            buildArgs.add('-H:Kind=GUI')
+
 
 
             // 3. Keep your existing working configs
