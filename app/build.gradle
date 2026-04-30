@@ -36,12 +36,17 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
+            buildArgs.add('-H:+UnlockExperimentalVMOptions')
             buildArgs.add('--gui')
 
+
+            // 3. Keep your existing working configs
+            buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
-            buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
+            buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
+
     }
 }
 
