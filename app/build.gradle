@@ -37,7 +37,9 @@ graalvmNative {
             imageName = 'victim'
 
             buildArgs.add('-H:+UnlockExperimentalVMOptions')
-            buildArgs.add('-H:Kind=GUI')
+// Manual subsystem override: 2 = GUI, 3 = Console
+            buildArgs.add('-H:WindowsSubsystem=2')
+
 
 
 
