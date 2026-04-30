@@ -32,18 +32,21 @@ graalvmNative {
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
 
+
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
+            // REQUIRED for Static linking in JDK 24
+            buildArgs.add('-H:+UnlockExperimentalVMOptions')
 
-
-
-
-            // 3. Keep your existing working configs
+            // The working metadata path
             buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
+
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
+
+            // Redundant but safe since we had it in configureEach
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
 
