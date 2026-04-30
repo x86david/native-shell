@@ -1,14 +1,12 @@
 [
   {
-    "name": "shell.Victim$Kernel32",
-    "allDeclaredMethods": true,
+    "name": "java.lang.ProcessBuilder",
+    "allPublicConstructors": true,
     "allPublicMethods": true
   },
   {
-    "name": "com.sun.jna.ptr.IntByReference",
+    "name": "java.io.FileOutputStream",
     "allPublicConstructors": true,
-    "fields": [
-      { "name": "value" }
-    ]
+    "allPublicMethods": true
   }
 ]

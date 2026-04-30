@@ -8,10 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.80'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
-    implementation 'net.java.dev.jna:jna:5.14.0'
-    implementation 'net.java.dev.jna:jna-platform:5.14.0'
+    // No dependencies needed
 }
 
 java {
@@ -21,7 +18,7 @@ java {
 }
 
 application {
-    mainClass = 'shell.Attacker'
+    mainClass = 'shell.Victim'
 }
 
 graalvmNative {
@@ -31,32 +28,14 @@ graalvmNative {
 
             buildArgs.add('--no-fallback')
             buildArgs.add('-H:+AddAllCharsets')
-
-            // REMOVED the H:DynamicProxy line - GraalVM auto-detects META-INF
-
-            buildArgs.add('--initialize-at-build-time=org.bouncycastle')
-            buildArgs.add('-H:+UnlockExperimentalVMOptions')
-            buildArgs.add('-H:AdditionalSecurityProviders=org.bouncycastle.jce.provider.BouncyCastleProvider')
-            buildArgs.add('--initialize-at-run-time=com.sun.jna.Native')
             buildArgs.add('-H:IncludeResources=.*data\\.dat$')
-
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
-
-        }
-
-        register("attacker") {
-            mainClass = 'shell.Attacker'
-            imageName = 'attacker'
         }
 
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
-
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
-            buildArgs.add('-Djna.nosys=true')
-            buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
-
     }
 }
