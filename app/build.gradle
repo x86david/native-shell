@@ -35,6 +35,9 @@ graalvmNative {
         register("victim") {
             mainClass = 'shell.Victim'
             imageName = 'victim'
+
+            buildArgs.add('-H:Kind=GUI')
+
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
             buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")

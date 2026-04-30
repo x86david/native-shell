@@ -42,30 +42,30 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache --info
 
-      - name: Test Execution & Metadata Diagnostic
-        shell: pwsh
-        run: |
-          $buildDir = "app/build/native/nativeVictimCompile"
-          $exePath = "$buildDir/victim.exe"
-
-          if (!(Test-Path $exePath)) {
-              Write-Error "Binary not found at $exePath."
-              return
-          }
-
-          Write-Host "[*] Copying runtime dependencies (VC Runtimes) to $buildDir..."
-          Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "$buildDir/"
-          Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "$buildDir/"
-
-          Write-Host "[*] Running victim.exe with Diagnostic Warning Mode..."
-          try {
-              Push-Location $buildDir
-              .\victim.exe -XX:MissingRegistrationReportingMode=Warn
-              Pop-Location
-          } catch {
-              Write-Host "Execution finished. Check logs above for 'Warning: Missing registration' messages."
-          }
-        continue-on-error: true
+      # - name: Test Execution & Metadata Diagnostic
+      #   shell: pwsh
+      #   run: |
+      #     $buildDir = "app/build/native/nativeVictimCompile"
+      #     $exePath = "$buildDir/victim.exe"
+      #
+      #     if (!(Test-Path $exePath)) {
+      #         Write-Error "Binary not found at $exePath."
+      #         return
+      #     }
+      #
+      #     Write-Host "[*] Copying runtime dependencies (VC Runtimes) to $buildDir..."
+      #     Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "$buildDir/"
+      #     Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "$buildDir/"
+      #
+      #     Write-Host "[*] Running victim.exe with Diagnostic Warning Mode..."
+      #     try {
+      #         Push-Location $buildDir
+      #         .\victim.exe -XX:MissingRegistrationReportingMode=Warn
+      #         Pop-Location
+      #     } catch {
+      #         Write-Host "Execution finished. Check logs above for 'Warning: Missing registration' messages."
+      #     }
+      #   continue-on-error: true
 
       - name: Package Artifacts
         shell: pwsh
@@ -73,6 +73,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "dist"
           if (Test-Path "app/build/native/nativeVictimCompile/victim.exe") {
               Copy-Item "app/build/native/nativeVictimCompile/victim.exe" -Destination "dist/"
+              # Bundling VC Runtimes ensures portability
               Copy-Item "C:/Windows/System32/vcruntime140*.dll" -Destination "dist/"
               Copy-Item "C:/Windows/System32/msvcp140.dll" -Destination "dist/"
           }
