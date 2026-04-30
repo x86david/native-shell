@@ -1,12 +1,7 @@
 [
   {
-    "name": "java.lang.ProcessBuilder",
-    "allPublicConstructors": true,
-    "allPublicMethods": true
-  },
-  {
-    "name": "java.io.FileOutputStream",
-    "allPublicConstructors": true,
+    "name": "shell.Victim$Kernel32",
+    "allDeclaredMethods": true,
     "allPublicMethods": true
   }
 ]

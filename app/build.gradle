@@ -8,7 +8,8 @@ repositories {
 }
 
 dependencies {
-    // No dependencies needed
+    implementation 'net.java.dev.jna:jna:5.14.0'
+    implementation 'net.java.dev.jna:jna-platform:5.14.0'
 }
 
 java {
@@ -24,11 +25,8 @@ application {
 graalvmNative {
     binaries {
         configureEach {
-            classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
-
             buildArgs.add('--no-fallback')
             buildArgs.add('-H:+AddAllCharsets')
-            buildArgs.add('-H:IncludeResources=.*data\\.dat$')
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
         }
 
@@ -36,6 +34,8 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
+            buildArgs.add('-Djna.nosys=true')
+            buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
         }
     }
 }
