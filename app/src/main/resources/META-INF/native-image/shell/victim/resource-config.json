@@ -1,5 +1,7 @@
 {
-  "resources": [
-    { "glob": "data.dat" }
-  ]
+  "resources": {
+    "includes": [
+      { "pattern": "data\\.dat" }
+    ]
+  }
 }
