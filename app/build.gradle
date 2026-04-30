@@ -30,7 +30,6 @@ graalvmNative {
             classpath = files(tasks.named('jar'), configurations.runtimeClasspath)
 
             buildArgs.add('--no-fallback')
-            buildArgs.add('--enable-all-security-services')
             buildArgs.add('-H:+AddAllCharsets')
 
             // REMOVED the H:DynamicProxy line - GraalVM auto-detects META-INF

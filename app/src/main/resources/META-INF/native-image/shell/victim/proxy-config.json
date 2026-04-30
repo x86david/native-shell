@@ -8,8 +8,7 @@
     "interfaces": [
       "shell.Victim$Kernel32",
       "com.sun.jna.win32.StdCallLibrary",
-      "com.sun.jna.Library",
-      "com.sun.jna.alt.ObjectContext"
+      "com.sun.jna.Library"
     ]
   }
 ]
