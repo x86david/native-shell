@@ -36,7 +36,7 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            buildArgs.add('-H:Kind=GUI')
+            buildArgs.add('--gui')
 
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
