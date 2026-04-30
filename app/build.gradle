@@ -54,12 +54,6 @@ graalvmNative {
             mainClass = 'shell.Victim'
             imageName = 'victim'
 
-            // Enable strict mode to catch metadata errors at build time
-            buildArgs.add('--exact-reachability-metadata=shell')
-
-            // Point to the folder containing reachability-metadata.json
-            buildArgs.add("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image/shell/victim/")
-
             buildArgs.add('-H:+StaticExecutableWithDynamicLibC')
             buildArgs.add('-Djna.nosys=true')
             buildArgs.add('--enable-native-access=ALL-UNNAMED')

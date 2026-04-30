@@ -1,0 +1,14 @@
+[
+  {
+    "name": "shell.Victim$Kernel32",
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.sun.jna.ptr.IntByReference",
+    "allPublicConstructors": true,
+    "fields": [
+      { "name": "value" }
+    ]
+  }
+]

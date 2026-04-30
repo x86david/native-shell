@@ -4,6 +4,7 @@ on: [push, workflow_dispatch]
 jobs:
   build-windows:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,24 +18,28 @@ jobs:
       - name: Debug Path Structure
         shell: pwsh
         run: |
-          Write-Host "--- Verifying JDK 24 Consolidated Metadata ---"
+          Write-Host "--- Verifying GraalVM Metadata Files ---"
           $metaDir = "app/src/main/resources/META-INF/native-image/shell/victim"
-          $metaFile = "$metaDir/reachability-metadata.json"
-          
-          if (Test-Path $metaFile) { 
-              Write-Host "[OK] Found consolidated metadata at: $((Get-Item $metaFile).FullName)"
-              Write-Host "--- File Content ---"
-              Get-Content $metaFile
-          } else {
-              Write-Host "[!] Metadata file NOT found at $metaFile" -ForegroundColor Red
-              Write-Host "Check your directory structure: $metaDir"
+
+          $files = @(
+            "proxy-config.json",
+            "reflect-config.json",
+            "resource-config.json"
+          )
+
+          foreach ($f in $files) {
+              $path = "$metaDir/$f"
+              if (Test-Path $path) {
+                  Write-Host "[OK] Found: $path"
+              } else {
+                  Write-Host "[!] Missing: $path" -ForegroundColor Red
+              }
           }
 
       - name: Build Victim EXE
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          :: The --info flag ensures we see if GraalVM picks up our config folder
           gradlew.bat :app:nativeVictimCompile --no-configuration-cache --info
 
       - name: Test Execution & Metadata Diagnostic
@@ -55,7 +60,6 @@ jobs:
           Write-Host "[*] Running victim.exe with Diagnostic Warning Mode..."
           try {
               Push-Location $buildDir
-              # This flag forces the app to warn about missing metadata instead of crashing
               .\victim.exe -XX:MissingRegistrationReportingMode=Warn
               Pop-Location
           } catch {
